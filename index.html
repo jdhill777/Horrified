@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Horrified Companion</title>
+  <title>Horrified Companion — Classic Pro+</title>
   <meta name="theme-color" content="#0d0d12"/>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
@@ -15,25 +15,24 @@
   <header class="topbar">
     <div class="brand">
       <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true">
-        <defs>
-          <radialGradient id="g" cx="50%" cy="50%" r="60%">
-            <stop offset="0%" stop-color="#a6ffef" stop-opacity="0.9"/>
-            <stop offset="100%" stop-color="#0d0d12" stop-opacity="0.2"/>
-          </radialGradient>
-        </defs>
+        <defs><radialGradient id="g" cx="50%" cy="50%" r="60%">
+          <stop offset="0%" stop-color="#a6ffef" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#0d0d12" stop-opacity="0.2"/>
+        </radialGradient></defs>
         <circle cx="32" cy="32" r="28" fill="url(#g)" stroke="#FC8C1C" stroke-width="3"/>
         <text x="50%" y="56%" text-anchor="middle" font-size="28" font-family="Creepster, Inter" fill="#f5f0e6">HC</text>
       </svg>
       <div>
         <h1>Horrified Companion</h1>
-        <p class="sub">Jack &amp; Meg’s game-night tracker</p>
+        <p class="sub">Classic Monsters • Pro+</p>
       </div>
     </div>
     <nav class="nav">
-      <button id="btnSetup" class="ghost">Setup</button>
-      <button id="btnSession" class="ghost">Session</button>
-      <button id="btnStats" class="ghost">Stats</button>
-      <button id="btnExport" class="ghost" title="Export all data">Export</button>
+      <button data-view="setup" class="ghost nav-btn">Setup</button>
+      <button data-view="session" class="ghost nav-btn">Session</button>
+      <button data-view="board" class="ghost nav-btn">Board</button>
+      <button data-view="stats" class="ghost nav-btn">Stats</button>
+      <button id="btnExport" class="ghost">Export</button>
       <label class="file-upload">
         <input type="file" id="fileImport" accept="application/json" hidden>
         <span>Import</span>
@@ -43,89 +42,125 @@
 
   <main id="viewSetup" class="view show">
     <section class="panel">
-      <h2>Players</h2>
-      <div class="grid two">
-        <label>Player 1
-          <input id="p1" value="Jack">
+      <h2>Ambient Audio</h2>
+      <div class="audio-controls">
+        <label class="file-upload small">
+          <input type="file" id="audioFile" accept="audio/*" hidden>
+          <span>Select audio</span>
         </label>
-        <label>Player 2
-          <input id="p2" value="Meg">
+        <button id="audioPlay" class="ghost">Play</button>
+        <button id="audioPause" class="ghost">Pause</button>
+        <label class="slider">Volume
+          <input type="range" id="audioVol" min="0" max="1" step="0.01" value="0.35">
         </label>
+        <label class="check"><input type="checkbox" id="audioLoop" checked> Loop</label>
+      </div>
+      <p class="hint">Tip: drag in any spooky MP3. The browser will remember it until you clear site data.</p>
+      <audio id="ambient" preload="none"></audio>
+    </section>
+
+    <section class="panel">
+      <h2>Players &amp; Characters</h2>
+      <div id="players"></div>
+      <div class="actions">
+        <button id="addPlayer" class="cta">Add Player</button>
       </div>
     </section>
 
     <section class="panel">
-      <h2>Game &amp; Monsters</h2>
-      <div class="grid two">
-        <label>Set
-          <select id="gameSet">
-            <option value="classic">Classic Monsters</option>
-            <option value="american">American Monsters</option>
-            <option value="both">Both Sets</option>
-          </select>
-        </label>
-        <label>Target Win Condition
-          <select id="target">
-            <option value="standard">Standard (win/lose)</option>
-            <option value="speedrun">Speedrun (fewest turns)</option>
-            <option value="safety">Safety (fewest terror)</option>
-          </select>
-        </label>
-      </div>
+      <h2>Monsters</h2>
       <div id="monsterPicker" class="monster-picker"></div>
-      <div class="hint">Tip: in the base game, more monsters = higher difficulty.</div>
-    </section>
-
-    <section class="panel">
-      <h2>House Rules</h2>
-      <label class="check"><input id="hrFastVillagers" type="checkbox"> Double-move rescued villagers</label>
-      <label class="check"><input id="hrNoPerks" type="checkbox"> No perks</label>
-      <label class="check"><input id="hrHardEvents" type="checkbox"> Always resolve hardest event</label>
+      <div class="hint">Pick the monsters for tonight’s game.</div>
     </section>
 
     <section class="panel actions">
-      <button id="btnStart" class="cta">Start New Session</button>
+      <button id="btnStart" class="cta">Start / Update Session</button>
     </section>
   </main>
 
   <main id="viewSession" class="view">
-    <section class="hud">
-      <div class="hud-item">
-        <span class="hud-label">Terror</span>
-        <div class="track">
-          <button class="step" id="terrorDown">–</button>
-          <div id="terrorDisplay" class="count">0</div>
-          <button class="step" id="terrorUp">+</button>
-        </div>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">Villagers Saved</span>
-        <div class="track">
-          <button class="step" id="savedDown">–</button>
-          <div id="savedDisplay" class="count">0</div>
-          <button class="step" id="savedUp">+</button>
-        </div>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">Turns</span>
-        <div class="track">
-          <button class="step" id="turnDown">–</button>
-          <div id="turnDisplay" class="count">0</div>
-          <button class="step" id="turnUp">+</button>
-        </div>
-      </div>
-      <div class="hud-item">
-        <button id="btnEnd" class="danger">End Session</button>
+    <section class="panel">
+      <h2>Turn Tracker</h2>
+      <div id="turnBar" class="turnbar"></div>
+      <div class="turn-controls">
+        <button id="useAction" class="ghost">Use Action (-1)</button>
+        <button id="nextTurn" class="cta">End Turn → Next</button>
+        <button id="resetActions" class="ghost">Reset Actions</button>
       </div>
     </section>
 
-    <section id="monsterArea" class="panel monster-area">
-      <!-- Monster cards injected here -->
+    <section class="panel grid two">
+      <div>
+        <h2>Perk Cards</h2>
+        <div id="perkPanel"></div>
+        <div class="card-adder">
+          <select id="perkOwner" class="fancy-select"></select>
+          <input id="perkTitle" placeholder="Perk title or note">
+          <button id="addPerk" class="ghost">Add Perk</button>
+        </div>
+      </div>
+      <div>
+        <h2>Monster Cards</h2>
+        <div id="monsterLog"></div>
+        <div class="card-adder">
+          <select id="monsterTemplate" class="fancy-select">
+            <option value="Monster moves">Monster moves</option>
+            <option value="Place villager">Place villager</option>
+            <option value="Event">Event</option>
+          </select>
+          <input id="monsterNote" placeholder="Details (e.g., which monster, where)">
+          <button id="addMonsterCard" class="ghost">Log</button>
+        </div>
+
+        <div class="panel" style="margin-top:.8rem">
+          <h3 style="margin:0 0 .5rem">Rule Helper: Move Monster</h3>
+          <div class="grid two">
+            <label>Monster
+              <select id="helperMonster" class="fancy-select"></select>
+            </label>
+            <label>Steps
+              <input id="helperSteps" type="number" min="0" max="4" value="2">
+            </label>
+          </div>
+          <label class="check" style="margin-top:.5rem"><input type="checkbox" id="helperClosest" checked> Toward closest person (heroes/villagers)</label>
+          <div class="actions" style="justify-content:flex-end;margin-top:.6rem">
+            <button id="applyMove" class="cta">Apply Move</button>
+          </div>
+          <p class="hint">Shortest path per rules. Creature uses water paths; others ignore water. Bridges are the only way across the river.</p>
+        </div>
+
+        <div class="panel">
+          <h3 style="margin:0 0 .5rem">Quick: Place Villager</h3>
+          <div class="grid two">
+            <label>Location
+              <select id="helperVillagerLoc" class="fancy-select"></select>
+            </label>
+            <label>Name (optional)<input id="helperVillagerName" placeholder="e.g., Lucy"></label>
+          </div>
+          <div class="actions" style="justify-content:flex-end;margin-top:.6rem">
+            <button id="applyVillager" class="ghost">Add Villager</button>
+          </div>
+        </div>
+
+      </div>
     </section>
 
     <section class="panel">
-      <h2>Notes</h2>
-      <textarea id="notes" rows="4" placeholder="Key moments, brutal defeats, hilarious saves…"></textarea>
+      <h2>Action Log</h2>
+      <div id="actionLog" class="log"></div>
+      <div class="actions">
+        <button id="clearLog" class="danger">Clear Log</button>
+      </div>
+    </section>
+  </main>
+
+  <main id="viewBoard" class="view">
+    <section class="panel">
+      <h2>Town Map (Classic preset)</h2>
+      <div class="map-wrap">
+        <svg id="boardSvg" viewBox="0 0 1200 700" class="svg-map" aria-label="Classic map"></svg>
+      </div>
+      <div class="hint">Tokens snap to nodes. Click node names to rename. Edit edges via the JSON (Export/Import) if you want to tweak the graph.</div>
     </section>
   </main>
 
@@ -145,7 +180,7 @@
   </main>
 
   <footer class="footer">
-    <p>Made for Jack &amp; Meg • Theme inspired by classic movie monsters. This is a fan-made companion and not affiliated with any publisher.</p>
+    <p>Fan-made companion for personal use. No game assets included.</p>
   </footer>
 
   <script src="app.js"></script>
